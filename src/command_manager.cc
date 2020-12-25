@@ -319,19 +319,9 @@ expand_token(const Token& token, const Context& context, const ShellContext& she
     {
     case Token::Type::ShellExpand:
     {
-        auto str = ShellManager::instance().eval(
+        return {ShellManager::instance().eval(
             content, context, {}, ShellManager::Flags::WaitForStdout,
-            shell_context).first;
-
-        int trailing_eol_count = 0;
-        for (auto c : str | reverse())
-        {
-            if (c != '\n')
-                break;
-            ++trailing_eol_count;
-        }
-        str.resize(str.length() - trailing_eol_count, 0);
-        return {str};
+            shell_context).first};
     }
     case Token::Type::RegisterExpand:
         if constexpr (single)
