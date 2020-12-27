@@ -8,6 +8,8 @@
 #include "keys.hh"
 #include "ranges.hh"
 #include "string_utils.hh"
+#include "register_manager.hh"
+#include "context.hh"
 
 #include <cstdio>
 #include <utility>
@@ -247,6 +249,19 @@ void JsonUI::eval_json(const Value& json)
             for (auto& key : parse_keys(key_val.as<String>()))
                 m_on_key(key);
         }
+    }
+    else if (method == "register")
+    {
+        if (params.size() != 2)
+            throw invalid_rpc_request("register or contents not specified");
+
+        if (not params[0].is_a<String>() or not (params[0].as<String>().length() == 1))
+            throw invalid_rpc_request("register is not a char");
+
+        auto& reg = RegisterManager::instance()[params[0].as<String>()];
+        Context context{Context::EmptyContextFlag{}};
+
+        reg.set(context, params[1].as<String>());
     }
     else if (method == "mouse_move")
     {
